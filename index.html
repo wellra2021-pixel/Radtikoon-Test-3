@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จับสลาก สุ่มของรางวัล 155 ป้าย (เรียงลำดับ)</title> 
+    <title>จับสลาก สุ่มของรางวัล 113 ป้าย (เรียงลำดับ)</title> 
     <style>
         * {
             box-sizing: border-box;
@@ -120,12 +120,12 @@
     <div class="grid-container" id="gridContainer"></div>
 
     <script>
-        const TOTAL_CARDS = 155;
+        const TOTAL_CARDS = 113;
         let shuffledNumbers = [];
         let openedCards = []; 
 
         function initGame() {
-            // 🔴 บังคับสร้างเลขเรียง 1 ถึง 155 เสมอ โดยไม่สนข้อมูลเก่าในระบบ
+            // 🔴 บังคับสร้างเลขเรียง 1 ถึง 113 เสมอ โดยไม่สนข้อมูลเก่าในระบบ
             shuffledNumbers = Array.from({length: TOTAL_CARDS}, (_, i) => i + 1);
 
             const savedOpened = localStorage.getItem('openedCards');
