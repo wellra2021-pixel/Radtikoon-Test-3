@@ -114,13 +114,13 @@
 </head>
 <body>
 
-    <h1>จับสลาก สุ่มของรางวัล</h1>
+    <h1>จับสลาก สุ่มของรางวัล 113 ป้าย</h1>
     <button class="reset-btn" onclick="resetGame()">เริ่มเกมใหม่ (สลับตำแหน่งรูปใหม่ทั้งหมด)</button>
 
     <div class="grid-container" id="gridContainer"></div>
 
     <script>
-        const TOTAL_CARDS = 113;
+        const TOTAL_CARDS = 113; // กำหนดจำนวนป้ายที่นี่
         let shuffledNumbers = [];
         let openedCards = []; 
 
@@ -131,6 +131,7 @@
             if (savedNumbers) {
                 shuffledNumbers = JSON.parse(savedNumbers);
             } else {
+                // ระบบสุ่มสลับตำแหน่ง (Random)
                 shuffledNumbers = Array.from({length: TOTAL_CARDS}, (_, i) => i + 1);
                 for (let i = shuffledNumbers.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
@@ -147,7 +148,7 @@
         }
 
         function resetGame() {
-            if(confirm('แน่ใจหรือไม่ว่าต้องการล้างข้อมูลเพื่อเริ่มสุ่มใหม่? (รูปทั้งหมดจะถูกสลับตำแหน่งใหม่)')) {
+            if(confirm('แน่ใจหรือไม่ว่าต้องการล้างข้อมูลเพื่อเริ่มสุ่มใหม่? (รูปทั้งหมดจะถูกสลับตำแหน่งกระจายใหม่)')) {
                 localStorage.removeItem('drawNumbers');
                 localStorage.removeItem('openedCards');
                 location.reload(); 
@@ -182,13 +183,13 @@
             container.innerHTML = '';
 
             for (let i = 0; i < TOTAL_CARDS; i++) {
-                // ตัวแปร randomNumber คือเลขที่ถูกสุ่มมาอยู่ในช่องนี้
+                // ตัวเลขที่ถูกสุ่มมาอยู่ในช่องนี้
                 const randomNumber = shuffledNumbers[i]; 
 
                 const card = document.createElement('div');
                 card.className = 'card';
 
-                // เช็คว่า "หมายเลขนี้" เคยถูกเปิดไปแล้วหรือยัง
+                // เช็คว่าป้ายนี้ถูกเปิดไปแล้วหรือยัง
                 if (openedCards.includes(randomNumber)) {
                     card.classList.add('flipped', 'disabled');
                 }
@@ -198,7 +199,6 @@
                         playFlipSound();
                         card.classList.add('flipped', 'disabled');
                         
-                        // บันทึกว่ารูปหมายเลขนี้ถูกเปิดแล้ว
                         openedCards.push(randomNumber);
                         localStorage.setItem('openedCards', JSON.stringify(openedCards));
                     }
@@ -212,7 +212,7 @@
                 
                 const img = document.createElement('img');
                 
-                // 🔴 นำเลขที่สุ่มได้มาใช้เป็นชื่อไฟล์ เพื่อให้รูปภาพสลับตำแหน่งกัน (กระจายๆ)
+                // ดึงรูปภาพตามตัวเลขที่ถูกสุ่ม
                 img.src = `${randomNumber}.jpg`;
                 img.alt = `Photo ${randomNumber}`;
 
@@ -234,7 +234,7 @@
                 const cardBack = document.createElement('div');
                 cardBack.className = 'card-back';
                 
-                // 🔴 ด้านหลังแสดงตัวเลขให้ตรงกับรูปภาพด้านหน้าเป๊ะๆ
+                // แสดงตัวเลขด้านหลังให้ตรงกับรูปภาพด้านหน้า
                 cardBack.innerText = randomNumber;
 
                 cardInner.appendChild(cardFront);
