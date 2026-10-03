@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จับสลาก สุ่มของรางวัล 155 ป้าย</title> 
+    <title>จับสลาก สุ่มของรางวัล 155 ป้าย (เรียงลำดับ)</title> 
     <style>
         * {
             box-sizing: border-box;
@@ -115,7 +115,7 @@
 <body>
 
     <h1>จับสลาก สุ่มของรางวัล</h1>
-    <button class="reset-btn" onclick="resetGame()">เริ่มเกมใหม่ (ล้างข้อมูลเก่า)</button>
+    <button class="reset-btn" onclick="resetGame()">เริ่มเกมใหม่ (ล้างข้อมูลป้ายที่เปิดแล้ว)</button>
 
     <div class="grid-container" id="gridContainer"></div>
 
@@ -125,17 +125,10 @@
         let openedCards = []; 
 
         function initGame() {
-            const savedNumbers = localStorage.getItem('drawNumbers');
+            // 🔴 บังคับสร้างเลขเรียง 1 ถึง 155 เสมอ โดยไม่สนข้อมูลเก่าในระบบ
+            shuffledNumbers = Array.from({length: TOTAL_CARDS}, (_, i) => i + 1);
+
             const savedOpened = localStorage.getItem('openedCards');
-
-            if (savedNumbers) {
-                shuffledNumbers = JSON.parse(savedNumbers);
-            } else {
-                // 🔴 นำโค้ดสุ่มสลับตำแหน่งออก เพื่อให้ตัวเลขเรียง 1, 2, 3... เป็นระเบียบ
-                shuffledNumbers = Array.from({length: TOTAL_CARDS}, (_, i) => i + 1);
-                localStorage.setItem('drawNumbers', JSON.stringify(shuffledNumbers));
-            }
-
             if (savedOpened) {
                 openedCards = JSON.parse(savedOpened);
             } else {
@@ -144,9 +137,11 @@
         }
 
         function resetGame() {
-            if(confirm('แน่ใจหรือไม่ว่าต้องการล้างข้อมูลเพื่อเริ่มใหม่?')) {
-                localStorage.removeItem('drawNumbers');
+            if(confirm('แน่ใจหรือไม่ว่าต้องการล้างข้อมูลป้ายที่เปิดแล้วทั้งหมด เพื่อเริ่มงานใหม่?')) {
+                // ล้างเฉพาะข้อมูลป้ายที่เปิด
                 localStorage.removeItem('openedCards');
+                // ล้างข้อมูลการสุ่มของโค้ดเวอร์ชันเก่าทิ้งไปด้วย (กันเหนียว)
+                localStorage.removeItem('drawNumbers'); 
                 location.reload(); 
             }
         }
