@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จับสลาก สุ่มของรางวัล 155 ป้าย</title>
+    <title>จับสลาก สุ่มของรางวัล 155 ป้าย</title> 
     <style>
         * {
             box-sizing: border-box;
@@ -115,7 +115,7 @@
 <body>
 
     <h1>จับสลาก สุ่มของรางวัล</h1>
-    <button class="reset-btn" onclick="resetGame()">เริ่มเกมใหม่ (สลับตำแหน่งรูปใหม่ทั้งหมด)</button>
+    <button class="reset-btn" onclick="resetGame()">เริ่มเกมใหม่ (ล้างข้อมูลเก่า)</button>
 
     <div class="grid-container" id="gridContainer"></div>
 
@@ -131,11 +131,8 @@
             if (savedNumbers) {
                 shuffledNumbers = JSON.parse(savedNumbers);
             } else {
+                // 🔴 นำโค้ดสุ่มสลับตำแหน่งออก เพื่อให้ตัวเลขเรียง 1, 2, 3... เป็นระเบียบ
                 shuffledNumbers = Array.from({length: TOTAL_CARDS}, (_, i) => i + 1);
-                for (let i = shuffledNumbers.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [shuffledNumbers[i], shuffledNumbers[j]] = [shuffledNumbers[j], shuffledNumbers[i]];
-                }
                 localStorage.setItem('drawNumbers', JSON.stringify(shuffledNumbers));
             }
 
@@ -147,7 +144,7 @@
         }
 
         function resetGame() {
-            if(confirm('แน่ใจหรือไม่ว่าต้องการล้างข้อมูลเพื่อเริ่มสุ่มใหม่? (รูปทั้งหมดจะถูกสลับตำแหน่งใหม่)')) {
+            if(confirm('แน่ใจหรือไม่ว่าต้องการล้างข้อมูลเพื่อเริ่มใหม่?')) {
                 localStorage.removeItem('drawNumbers');
                 localStorage.removeItem('openedCards');
                 location.reload(); 
@@ -182,13 +179,11 @@
             container.innerHTML = '';
 
             for (let i = 0; i < TOTAL_CARDS; i++) {
-                // ตัวแปร randomNumber คือเลขที่ถูกสุ่มมาอยู่ในช่องนี้
                 const randomNumber = shuffledNumbers[i]; 
 
                 const card = document.createElement('div');
                 card.className = 'card';
 
-                // เช็คว่า "หมายเลขนี้" เคยถูกเปิดไปแล้วหรือยัง
                 if (openedCards.includes(randomNumber)) {
                     card.classList.add('flipped', 'disabled');
                 }
@@ -198,7 +193,6 @@
                         playFlipSound();
                         card.classList.add('flipped', 'disabled');
                         
-                        // บันทึกว่ารูปหมายเลขนี้ถูกเปิดแล้ว
                         openedCards.push(randomNumber);
                         localStorage.setItem('openedCards', JSON.stringify(openedCards));
                     }
@@ -212,7 +206,6 @@
                 
                 const img = document.createElement('img');
                 
-                // 🔴 นำเลขที่สุ่มได้มาใช้เป็นชื่อไฟล์ เพื่อให้รูปภาพสลับตำแหน่งกัน (กระจายๆ)
                 img.src = `${randomNumber}.jpg`;
                 img.alt = `Photo ${randomNumber}`;
 
@@ -234,7 +227,6 @@
                 const cardBack = document.createElement('div');
                 cardBack.className = 'card-back';
                 
-                // 🔴 ด้านหลังแสดงตัวเลขให้ตรงกับรูปภาพด้านหน้าเป๊ะๆ
                 cardBack.innerText = randomNumber;
 
                 cardInner.appendChild(cardFront);
