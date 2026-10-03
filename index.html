@@ -20,7 +20,23 @@
 
         h1 {
             color: #1a73e8;
+            margin-bottom: 15px;
+        }
+
+        .reset-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
             margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .reset-btn:hover {
+            background-color: #c82333;
         }
 
         .grid-container {
@@ -99,18 +115,46 @@
 <body>
 
     <h1>จับสลาก สุ่มของรางวัล</h1>
+    <button class="reset-btn" onclick="resetGame()">เริ่มเกมใหม่ (ล้างข้อมูลเก่า)</button>
 
     <div class="grid-container" id="gridContainer"></div>
 
     <script>
         const TOTAL_CARDS = 155;
         let shuffledNumbers = [];
+        let openedCards = []; // ตัวแปรเก็บข้อมูลป้ายที่เปิดไปแล้ว
 
-        function generateShuffledNumbers() {
-            shuffledNumbers = Array.from({length: TOTAL_CARDS}, (_, i) => i + 1);
-            for (let i = shuffledNumbers.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffledNumbers[i], shuffledNumbers[j]] = [shuffledNumbers[j], shuffledNumbers[i]];
+        function initGame() {
+            // ดึงข้อมูลจากความจำของ Browser (Local Storage)
+            const savedNumbers = localStorage.getItem('drawNumbers');
+            const savedOpened = localStorage.getItem('openedCards');
+
+            if (savedNumbers) {
+                // ถ้ามีข้อมูลเก่าอยู่แล้ว ให้นำมาใช้
+                shuffledNumbers = JSON.parse(savedNumbers);
+            } else {
+                // ถ้ายังไม่มีข้อมูล ให้สุ่มใหม่ทั้งหมด
+                shuffledNumbers = Array.from({length: TOTAL_CARDS}, (_, i) => i + 1);
+                for (let i = shuffledNumbers.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffledNumbers[i], shuffledNumbers[j]] = [shuffledNumbers[j], shuffledNumbers[i]];
+                }
+                // บันทึกตัวเลขที่สุ่มแล้วลงความจำ
+                localStorage.setItem('drawNumbers', JSON.stringify(shuffledNumbers));
+            }
+
+            if (savedOpened) {
+                openedCards = JSON.parse(savedOpened);
+            } else {
+                openedCards = [];
+            }
+        }
+
+        function resetGame() {
+            if(confirm('แน่ใจหรือไม่ว่าต้องการล้างข้อมูลเพื่อเริ่มสุ่มใหม่ทั้งหมดตั้งแต่ป้ายแรก?')) {
+                localStorage.removeItem('drawNumbers');
+                localStorage.removeItem('openedCards');
+                location.reload(); // รีเฟรชหน้าเว็บ
             }
         }
 
@@ -124,20 +168,15 @@
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
-
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-
             osc.type = 'sine';
             osc.frequency.setValueAtTime(400, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.08);
-
             gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
-
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-
             osc.start();
             osc.stop(audioCtx.currentTime + 0.08);
         }
@@ -153,10 +192,19 @@
                 const card = document.createElement('div');
                 card.className = 'card';
 
+                // เช็คว่าป้ายนี้เคยถูกเปิดไปแล้วหรือยัง
+                if (openedCards.includes(cardIndex)) {
+                    card.classList.add('flipped', 'disabled');
+                }
+
                 card.onclick = function() {
                     if (!card.classList.contains('flipped')) {
                         playFlipSound();
                         card.classList.add('flipped', 'disabled');
+                        
+                        // บันทึกว่าป้ายนี้ถูกเปิดแล้ว
+                        openedCards.push(cardIndex);
+                        localStorage.setItem('openedCards', JSON.stringify(openedCards));
                     }
                 };
 
@@ -167,7 +215,6 @@
                 cardFront.className = 'card-front';
                 
                 const img = document.createElement('img');
-                
                 img.src = `${cardIndex}.jpg`;
                 img.alt = `Photo ${cardIndex}`;
 
@@ -197,7 +244,7 @@
             }
         }
 
-        generateShuffledNumbers();
+        initGame();
         createBoard();
     </script>
 </body>
